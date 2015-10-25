@@ -1,15 +1,83 @@
 \section{Introduction}
-Stuff
+
+\subsection{Color gamuts}
+There are several issues involved in reproducing colors from one device on another.
+One important of these is the range of colors an imaging device, such as a camera, printer or monitor, is able to capture or provide.
+Take for example an outdoor scene captured with a digital camera.
+The camera will have a limited range of colors it can capture, so it can't capture the exact look of the real scene.
+If someone then wants to display the image on a monitor, that monitor will have a limited range of colors that it can provide, so it might not be able to reproduce the same look as the camera captured.
+This range of a set of colors that a device can reproduce is the color gamut~\cite{GamutMapping,HandbookGamutMapping}.
+
+Since the colors can be represented in a three-dimensional space, the color gamut can as well.
+This means that a color gamut has a volume and a surface, meaning that it is a three-dimensional mesh.
+This surface, which is \say{determined by a color gamut's extremities}~\cite{ColourImageScience}, is what is referred to as the gamut boundary, which is described by a gamut boundary descriptor (GBD)~\cite{HandbookGamutMapping}.
+
+\subsection{Visualizing of gamut boundaries}
+Because of the issues with color gamut and color gamut mapping, the need for visualizing the gamut of media appeared~\cite{InteractiveGamutMapping}.
+Visualizing color gamuts would allow people a better understanding the gamuts and issues involved.
+By visually displaying a color gamut, a human can intuitively see which color areas are outside or inside the gamut boundaries.
+Even more intuitevely a person can compare two color gamuts visually and determine which colors of one gamut is outside another.
+This can help understanding why an image doesn't appear right on a device and what needs to be done to map from one gamut to another in a pleasing or correct way.
+
+There are multiple ways of visualizing a gamut, in both two and three-dimensional spaces~\cite{ColourImaging,InteractiveGamutMapping}.
+Because colors can be represented in a three-dimensional space, three-dimensional visualizations properly represent the color gamut.
+Two-dimensional gamuts have to remove one dimension or simplify the problem in another way~\cite{InteractiveGamutMapping}.
+Still, they are very much used, mainly because the whole visualization can be shown as one single image on paper or a monitor.
+One of the more popular two-dimensional visualizations is the xy chromaticity diagram.
+For three-dimensional visualizations a mesh or scatterplot in CIELAB is most commonly used since CIELAB is three-dimensional (L*a*b*).
+
+\subsection{Gamut boundary encoding in iccMAX}
+The International Color Consortium (ICC) have created a standard specification image technology color management which includes an architecture, profile format and datastructure~\cite{ColorManagement}.
+The profile format allows manufactureres to create standard conforming profiles that define input or output characterizations.
+There are several versions of the ICC specificatio, with iccMAX being the 5th and latest version.~\cite{IccMax}
+The specification of iccMAX is currently in preliminary form, available for the public.
+It introduces many improvements, like flexible illuminant and color matching function and a new GBD.
+This goal of this project is to visualize this new GBD.
+
+\subsection{Cross-platform and open source}
+\label{sec:crossplatform-open}
+One of the goals of this project is to to only rely on open source projects, preferably with a noncopylefted license~\cite{GnuFreeCategories}.
+In addition the project itself will be released as noncopyledted open source software licensed under the MIT license~\cite{MitLicense}.
+There are many benefits of using and publishing open source software.
+Most importantly the software can be used by everyone without worrying about licensing restrictions.
+But open source also makes the software easier to maintain, inspires derivations and extensions.
+
+In addition, this project will be built for cross-platform usage.
+It is a fact today that many different platforms are used, from PC platforms such as Windows, Mac OS X and Linux, to mobile platforms such as Android and iPhone/iPad.
+It is important that the software is available on all of these platforms so that as few users as possible are left out.
+An additional requirement is that the software should without much effort work on new emerging platforms for a lonig-lasting life.
 
 \section{Methods}
-More stuff
+
+\subsection{Platform and technologies}
+To meet the requirements in Section~\ref{sec:crossplatform-open}, proper platform and technologies to build the application on have to be selected.
+There are several good platforms available to use today.
+One alternative is to write a native desktop application using cross-platform GUI toolkits, but this would mean compiling one version for each of the supported platforms, which will result in extra overhead.
+Another alternative is using a virtualized platform such as Java, but Java is seeing less support as a GUI front end and is not supported on all platforms (e.g.\ iPhone/iPad).
+While there are more alternatives, they have mostly the same limitatations.
+What remains then is the web platform.
+It is an open platform, it is supported by all major operating systems with a proper GUI, it supports hardware accelerated graphics, and the same source code will work on all browsers.
+The only requirement from the user side is that they have a relatively modern browser available.
+Thus the open web platform was selected as the base for building the application.
+
+
+
+\subsection{Parsing the GBD from iccMAX profiles}
+\subsection{Visualizing the gamut bondary}
 
 \section{Results}
-Event more stuff
+\begin{itemize}
+	\item Show screenshots with sRGB gamut example
+\end{itemize}
 
 \section{Analysis}
-Lots of stuff
+\begin{itemize}
+	\item Discuss how well it works
+	\item Discuss correctness
+	\item Discuss issues
+	\item Discuss extensibility
+\end{itemize}
 
 \section{Conclusions}
-Enough stuff
+It's good, man
 
