@@ -12,7 +12,8 @@ Since the colors can be represented in a three-dimensional space, the color gamu
 This means that a color gamut has a volume and a surface, meaning that it is a three-dimensional mesh.
 This surface, which is \say{determined by a color gamut's extremities}~\cite{ColourImageScience}, is what is referred to as the gamut boundary, which is described by a gamut boundary descriptor (GBD)~\cite{HandbookGamutMapping}.
 
-\subsection{Visualizing of gamut boundaries}
+\subsection{Visualization of gamut boundaries}
+\label{sec:intro-gbd-viz}
 Because of the issues with color gamut and color gamut mapping, the need for visualizing the gamut of media appeared~\cite{InteractiveGamutMapping}.
 Visualizing color gamuts would allow people a better understanding the gamuts and issues involved.
 By visually displaying a color gamut, a human can intuitively see which color areas are outside or inside the gamut boundaries.
@@ -57,13 +58,41 @@ Another alternative is using a virtualized platform such as Java, but Java is se
 While there are more alternatives, they have mostly the same limitatations.
 What remains then is the web platform.
 It is an open platform, it is supported by all major operating systems with a proper GUI, it supports hardware accelerated graphics, and the same source code will work on all browsers.
-The only requirement from the user side is that they have a relatively modern browser available.
+One might think that it would require an active internet connection, but in fact a website can work offline as well.
+It can even be wrapped in another application including an internal web browser.
 Thus the open web platform was selected as the base for building the application.
 
-
+To allow faster development, while still having an appealing interface, the Boostrap library was used~\cite{Bootstrap}.
+To make the application dynamic and reactive the AngularJS library was used~\cite{Angular}.
+Both of these conform to web standards and work on many different browsers and versions.
+To allow for easier builds, which helps user and developer adoption, the popular and freely available Grunt build system together with npm as a dependency installer was used~\cite{Grunt,Npm}.
 
 \subsection{Parsing the GBD from iccMAX profiles}
+The application consists of two major parts: GBD parsing and GBD visalization.
+Since ICC Profiles use a binary format, a binary profile parser was written.
+It was based on the preliminary specification of iccMAX, so any iccMAX Profile will be parsed correctly as long as the specification do not change.
+The application searches through the Profile tag list until it finds the gbd0 tag, which is \say{the gamut boundary of the reference medium gamut that was used for the creation of the perceptual transform}~\cite{IccMaxSpec}.
+This tag and gbd1, gbd2 and gbd3 is of type gamutBoundaryDescriptionType.
+The implementation can easily be extended to also parse the other GBD tags.
+The GBD tag type is specified precisely in the specification, and the implementation follows this to the point.
+
+Finally, the GBD tag data required to visualize the gamut (faces and PCS vertices) plus the PCS spaced is stored in a JavaScript structure to later be parsed by the visualizer.
+
 \subsection{Visualizing the gamut bondary}
+The first major part of the application was the GBD parsing.
+With the GBD data now parsed, the second major part, GBD visualization, can take place.
+As discussed in Section~\ref{sec:intro-gbd-viz}, there exists several methods of visualizing gamut.
+Since most consumer computers can now handle 3D graphics well, the development platform supports 3D hardware acceleration, and 3D visualization is the most proper GBD visualization, a CIELAB space 3D visualization was selected for the first implementation.
+Other visualizations could be added at a later time.
+
+To fully utilize 3D hardware rendering, WebGL was used.
+But raw WebGL code is not easy nor fast to write, so a third party library called three.js was picked to handle the WebGL 3D rendering.
+
+The rendering implementation uses Model Makers that can be extended, to create the 3D visualized models.
+E.g.\ Point Model Maker and Solid Model Maker are extending the basic Model Maker to create a point and solid model respectively.
+This system allows for switching between visualizations and extending with different visualizations at a later time.
+
+
 
 \section{Results}
 \begin{itemize}
