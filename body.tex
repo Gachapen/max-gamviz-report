@@ -93,7 +93,7 @@ To make the application dynamic and reactive the AngularJS library was used~\cit
 Both of these conform to web standards and work on many different browsers and versions.
 To allow for easier builds, which helps user and developer adoption, the popular and freely available Grunt build system together with npm as a dependency installer was used~\cite{Grunt,Npm}.
 
-\subsection{Parsing the GBD from iccMAX profiles}
+\subsection{iccMAX profile GBD parsing}
 The application consists of two major parts: GBD parsing and GBD visalization.
 Since ICC Profiles use a binary format, a binary profile parser was written.
 It was based on the preliminary specification of iccMAX, so any iccMAX Profile will be parsed correctly as long as the specification do not change.
@@ -102,7 +102,7 @@ The implementation can easily be extended to also parse the other GBD tags.
 The GBD tag type is specified precisely in the specification, and the implementation follows this to the point.
 Finally, the GBD tag data required to visualize the gamut (faces and PCS vertices) plus the PCS space is stored in a JavaScript structure to later be parsed by the visualizer.
 
-\subsection{Visualizing the gamut bondary}
+\subsection{GBD visualization}
 With the GBD data now parsed, the second major part, GBD visualization, can take place.
 As discussed in Section~\ref{sec:intro-gbd-viz}, there exists several methods of visualizing gamut.
 Since most consumer computers can now handle 3D graphics well, the development platform supports 3D hardware acceleration, and 3D visualization is considered the most proper GBD visualization, a CIELAB space 3D visualization was selected for the first implementation.
@@ -134,8 +134,6 @@ The RGB values are finally clamped to the range [0,1] to avoid errors if the val
 For the solid and wrire frame models, the colors are linearly interpolated between the vertices of a face.
 
 \section{Results}
-
-\subsection{Application}
 The final working application can bee seen in Figure~\ref{fig:application}.
 In this figure, a test profile has been loaded and is rendered as a solid model.
 If no profile is loaded, only the three axes will be displayed.
@@ -221,13 +219,39 @@ Figure~\ref{fig:sides} shows screenshots taken from different angles.
 \end{figure}
 
 \section{Evaluation}
-\begin{itemize}
-	\item Discuss how well it works
-	\item Discuss correctness
-	\item Discuss issues
-	\item Discuss extensibility
-\end{itemize}
+\subsection{User Interface}
+The application has a very simple user interface, whith only a few options.
+This makes it easier for a user to learn how to use the tool.
+What the user interface is currently missing is proper error reporting touch screen support.
+Users should be presented with errors when a file could not be parsed.
+An application in the current times can not truly be called cross-platform if it does not support touch devices.
+While the current implementation does work on touch devices (e.g.\ smart phones), it does not support moving the camera with touch.
+The visualization does also not properly scale to the screen size, causing the model to look skewed.
+Both of these issues are not a limitation of the platform or technology.
+With more time, these issues can be fixed.
 
-\section{Conclusions}
-It's good, man
+\subsection{Correctness}
+Since the GBD specified in the iccMAX Profile is in CIELAB space, the vertices shown will always be correct as long as the gamut specified is correct.
+This can't be shown in the current application since the axes aren't numbered.
+The displayed colors are limited by the sRGB gamut, so displaying a profile which has vertices outside the sRGB gamut will have their colors clamped and thus not displayed correctly.
 
+\subsection{iccMAX parsing}
+Implementing the iccMAX Profile parers was easier than expected.
+The preliminary iccMAX specification is very clear and precise.
+It is relatively easy to understand for a software developer, which is important as it will reduce the number of wrong implementationsm make the behaviour concise over multiple systems and not hinder vendors to implement the specification.
+The preliminary iccMAX specification has some errors, but this is expected and the final version should have these fixed.
+
+\subsection{Fututre Work}
+The application can be extended with many options.
+Especially the rendering is of interest here, which is why the Model Maker system was created.
+As shown by the implementation, creating multiple renderers is an easy job with Model Makers and the powerful three.js JavaScript library.
+More fine grained control, like adjusting the background color is possible to add.
+
+Currently the implementation on supports displaying the GBD with colors in sRGB space.
+An addition to the application could be to let the users configure the color space and illuminant to use for the output colors.
+It could even be possible to let the users upload an ICC Profile (not necessarily iccMAX) to use for the output color transformations.
+
+\section{Conclusion}
+The result clearly shows that it is possible and feasable to create an effective cross-platform open source application to visualize the GBD of iccMAX Profiles.
+The tools and technology freely availeble makes this job easier than ever before.
+And with the clear and precise specification of iccMAX, writing a binary parser is not a problem.

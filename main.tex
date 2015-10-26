@@ -9,6 +9,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{float}
+\usepackage[toc,page]{appendix}
 
 \title{Cross-platform iccMAX profile gamut visualization using only open source technologies}
 \author{Magnus Bjerke Vik}
@@ -16,21 +17,30 @@
 
 \begin{document}
 
+\pagenumbering{roman}
+
 \maketitle
-
 \begin{abstract}
-\input{abstract}
+	\input{abstract}
 \end{abstract}
-
 \clearpage
 
 \tableofcontents
+\clearpage
+
 \listoffigures
 \clearpage
+
+\pagenumbering{arabic}
 
 \input{body} % includes latex files from the same directory
 
 \bibliographystyle{gucthesis/gucthesis}
 \bibliography{main}
+\clearpage
+
+\begin{appendices}
+	\input{appendices}
+\end{appendices}
 
 \end{document}
