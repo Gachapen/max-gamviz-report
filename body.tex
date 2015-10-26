@@ -33,7 +33,22 @@ The profile format allows manufactureres to create standard conforming profiles 
 There are several versions of the ICC specificatio, with iccMAX being the 5th and latest version.~\cite{IccMax}
 The specification of iccMAX is currently in preliminary form, available for the public.
 It introduces many improvements, like flexible illuminant and color matching function and a new GBD.
-This goal of this project is to visualize this new GBD.
+This new GBD is what this project aims to visualize.
+
+As specifiec by the specification, an iccMAX Profile can have five different GBD tags, all of which are of the same tag type: gamutBoundaryDescriptionType (gbd)~\cite{IccMaxSpec}.
+These tags have the signatures gbd0, gbd1, gbd2 and gbd3.
+Each of the tags describe GBD's for different types of transforms.
+gbd0 is \say{the gamut boundary of the reference medium gamut that was used for the creation of the perceptual transform}~\cite{IccMaxSpec}.
+gbd1 for the relative colorimetric transform, gbd2 is for the saturation intent transform and gbd3 is for the absolute colorimetric transform.
+
+The gbd tag is described by a list of vertices and a list of faces.
+Each vertex is a point in CIELAB color space that lay on the surface of the gamut boundary.
+Each face is a geometric triangle comprised of three indices into the list of vertices.
+All faces together will form a polygon mesh enclosing the gamut~\cite{BaselineGamut}.
+
+According to the preliminary specification, the GBD is always described with PCS cordinates, but it optionally supports device coordinates with its own vertices and faces as well.
+The number of PCS coordinates, which must be 3 or more, is also specified in the tag.
+When the gamut is viewed from the outside, the vertex order for each face is clockwise~\cite{IccMaxSpec}.
 
 \subsection{Cross-platform and open source}
 \label{sec:crossplatform-open}
@@ -48,7 +63,18 @@ It is a fact today that many different platforms are used, from PC platforms suc
 It is important that the software is available on all of these platforms so that as few users as possible are left out.
 An additional requirement is that the software should without much effort work on new emerging platforms for a lonig-lasting life.
 
-\section{Methods}
+\subsection{Delimitation and Assumptions}
+The gbd tag in the iccMAX specification is flexible in that it supports 3 or more PCS coordinates and device values as well as PCS values.
+This project will not concern itself with device values and will completely ignore their existence.
+As they are optional, it will not be a problem.
+Only 3 PCS channels and only the CIELAB PCS space will be supported.
+Only the gbd0 tag will be visualized.
+
+It is assumed that the preliminary specification is correct, and it will be followed to the point except for one case.
+The preliminary specification specifies the gbd0, gbd1, gbd2 and gbd3 tags as gdb0, gdb1, gdb2 and gdb3 respectively.
+It is assumed that this is wrong and that they will be corrected in the final version of the specification.
+
+\section{Implementation}
 
 \subsection{Platform and technologies}
 To meet the requirements in Section~\ref{sec:crossplatform-open}, proper platform and technologies to build the application on have to be selected.
@@ -71,28 +97,40 @@ To allow for easier builds, which helps user and developer adoption, the popular
 The application consists of two major parts: GBD parsing and GBD visalization.
 Since ICC Profiles use a binary format, a binary profile parser was written.
 It was based on the preliminary specification of iccMAX, so any iccMAX Profile will be parsed correctly as long as the specification do not change.
-The application searches through the Profile tag list until it finds the gbd0 tag, which is \say{the gamut boundary of the reference medium gamut that was used for the creation of the perceptual transform}~\cite{IccMaxSpec}.
-This tag and gbd1, gbd2 and gbd3 is of type gamutBoundaryDescriptionType.
+The application searches through the Profile tag list until it finds the gbd0 tag.
 The implementation can easily be extended to also parse the other GBD tags.
 The GBD tag type is specified precisely in the specification, and the implementation follows this to the point.
-
-Finally, the GBD tag data required to visualize the gamut (faces and PCS vertices) plus the PCS spaced is stored in a JavaScript structure to later be parsed by the visualizer.
+Finally, the GBD tag data required to visualize the gamut (faces and PCS vertices) plus the PCS space is stored in a JavaScript structure to later be parsed by the visualizer.
 
 \subsection{Visualizing the gamut bondary}
-The first major part of the application was the GBD parsing.
 With the GBD data now parsed, the second major part, GBD visualization, can take place.
 As discussed in Section~\ref{sec:intro-gbd-viz}, there exists several methods of visualizing gamut.
-Since most consumer computers can now handle 3D graphics well, the development platform supports 3D hardware acceleration, and 3D visualization is the most proper GBD visualization, a CIELAB space 3D visualization was selected for the first implementation.
-Other visualizations could be added at a later time.
+Since most consumer computers can now handle 3D graphics well, the development platform supports 3D hardware acceleration, and 3D visualization is considered the most proper GBD visualization, a CIELAB space 3D visualization was selected for the first implementation.
+Other visualizations can be added at a later time.
 
-To fully utilize 3D hardware rendering, WebGL was used.
-But raw WebGL code is not easy nor fast to write, so a third party library called three.js was picked to handle the WebGL 3D rendering.
+To fully utilize 3D hardware rendering, WebGL was used~\cite{WebGl}.
+But raw WebGL code is not easy nor fast to write, so a third party library called three.js was picked to handle the WebGL 3D rendering~\cite{ThreeJs}.
+A three.js scene with an orthographics camera and CIELAB L*, a* and b* axes has been created.
+The scene backround color is set to a grey color so that none of the colors at the gamut boundary are hidden.
+It has no light sources, except one perfect white (255,255,255) ambient light that will make the model reflect its exact surface color.
 
 The rendering implementation uses Model Makers that can be extended, to create the 3D visualized models.
-E.g.\ Point Model Maker and Solid Model Maker are extending the basic Model Maker to create a point and solid model respectively.
+There are currently three implemented Model Makers: Point Model Maker and Solid Model Maker and Wireframe Model Maker.
+They are all extending the basic Model Maker to createa point, solid and wireframe model respectively.
 This system allows for switching between visualizations and extending with different visualizations at a later time.
 
+The vertex coordinates of the boundary surface are converted to the WebGL rendering space from CIELAB.
+This conversion involves setting L* as the y-axis, a* as the x-axis, b* as the inverse z-axis.
+The b* has to be inversed because the z-axis of the rendering space points out of the screen.
 
+To show the colors on the boundary surface, they have to be converted from CIELAB to an RGB format as this is the only format that WebGL supports.
+Since sRGB is the de facto standard color profile for the web, the colors are converted to this colorspace.
+To accomplish this, the Chromatist JavaScript Library is used~\cite{Chromatist}.
+This library support converting to and from XYZ to various other color spaces, such as sRGB and CIELAB.
+To get to sRGB, the CIELAB data is first converted to XYZ using chromatist.cielab.Converter with the whitepoint of the profile as the media white.
+To get from XYZ to sRGB, chromatist.rgb.Converter is used with the default settings (sRGB, D65).
+Since chromatist.rgb.Converter assumes that the XYZ whitepoint of the input values is the same as the RGB space settings (D65), the XYZ values are chromatically adapted to D65 using chromatist.cat.Converter with the linear bradford algorithm.
+The RGB values are finally clamped to the range [0,1] to avoid errors if the values are out of gamut.
 
 \section{Results}
 \begin{itemize}
