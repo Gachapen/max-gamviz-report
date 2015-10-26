@@ -127,17 +127,100 @@ To show the colors on the boundary surface, they have to be converted from CIELA
 Since sRGB is the de facto standard color profile for the web, the colors are converted to this colorspace.
 To accomplish this, the Chromatist JavaScript Library is used~\cite{Chromatist}.
 This library support converting to and from XYZ to various other color spaces, such as sRGB and CIELAB.
-To get to sRGB, the CIELAB data is first converted to XYZ using chromatist.cielab.Converter with the whitepoint of the profile as the media white.
+To get to sRGB, the CIELAB data is first converted to XYZ using chromatist.cielab.Converter with D50 as the white point.
 To get from XYZ to sRGB, chromatist.rgb.Converter is used with the default settings (sRGB, D65).
 Since chromatist.rgb.Converter assumes that the XYZ whitepoint of the input values is the same as the RGB space settings (D65), the XYZ values are chromatically adapted to D65 using chromatist.cat.Converter with the linear bradford algorithm.
 The RGB values are finally clamped to the range [0,1] to avoid errors if the values are out of gamut.
+For the solid and wrire frame models, the colors are linearly interpolated between the vertices of a face.
 
 \section{Results}
-\begin{itemize}
-	\item Show screenshots with sRGB gamut example
-\end{itemize}
 
-\section{Analysis}
+\subsection{Application}
+The final working application can bee seen in Figure~\ref{fig:application}.
+In this figure, a test profile has been loaded and is rendered as a solid model.
+If no profile is loaded, only the three axes will be displayed.
+To load a profile, a user can click the \say{Choose File} button or drag a profile from a file manager and drop it into the visualization box.
+By default the application shows the solid rendered model, but by using the radio buttons to select between Solid, Wireframe and Point, a user can choose which rendering type to use.
+The different types can be seen in Figure~\ref{fig:types}.
+
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{img/max-gamviz}
+\caption{Running application with sRGB gamut example profile loaded as a solid model}
+\label{fig:application}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[t]{0.5\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{img/solid}
+		\caption{sRGB solid rendered GBD}
+	\end{subfigure}%
+	~
+	\begin{subfigure}[t]{0.5\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{img/wire}
+		\caption{sRGB wireframe rendered GBD}
+	\end{subfigure}%
+
+	\begin{subfigure}[t]{0.5\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{img/points}
+		\caption{sRGB point rendered GBD}
+	\end{subfigure}
+	\caption{Example sRGB GBD rendered as solid, wireframe and points}
+	\label{fig:types}
+\end{figure}
+
+The application does not handle errors.
+Loading a non-iccMAX Profile or a file which isn't an ICC Profile at all will silently fail without causing any issues in the application.
+
+A user can move the camera by holding the left mouse button and moving the mouse.
+This allows them to interactively inspect all angles of the gamut.
+Figure~\ref{fig:sides} shows screenshots taken from different angles.
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[t]{0.3\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{img/solid-top}
+		\caption{From top}
+	\end{subfigure}%
+	~
+	\begin{subfigure}[t]{0.3\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{img/solid-front}
+		\caption{From front}
+	\end{subfigure}%
+	~
+	\begin{subfigure}[t]{0.3\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{img/solid-left}
+		\caption{From left}
+	\end{subfigure}%
+
+	\begin{subfigure}[t]{0.3\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{img/solid-bottom}
+		\caption{From bottom}
+	\end{subfigure}%
+	~
+	\begin{subfigure}[t]{0.3\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{img/solid-back}
+		\caption{From behind}
+	\end{subfigure}%
+	~
+	\begin{subfigure}[t]{0.3\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{img/solid-right}
+		\caption{From right}
+	\end{subfigure}
+	\caption{Example sRGB GBD shown from different angles}
+	\label{fig:sides}
+\end{figure}
+
+\section{Evaluation}
 \begin{itemize}
 	\item Discuss how well it works
 	\item Discuss correctness
